@@ -27,27 +27,29 @@ namespace Amaggi.Blog.Data.Repositories
 
         public async Task<Post> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task AddAsync(Post entity)
+        public async Task<Post> AddAsync(Post post)
         {
-            await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(post);
 
             await _context.SaveChangesAsync();
+
+            return post;
         }
 
-        public async Task UpdateAsync(Post entity)
+        public async Task UpdateAsync(Post post)
         {
-            _dbSet.Update(entity);
+            _dbSet.Update(post);
 
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var entity = await _dbSet.FindAsync(id);
-            _dbSet.Remove(entity);
+            var post = await _dbSet.FindAsync(id);
+            _dbSet.Remove(post);
 
             await _context.SaveChangesAsync();
         }

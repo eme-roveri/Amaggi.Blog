@@ -1,4 +1,5 @@
 
+using Amaggi.Blog.API.Configuration;
 using Amaggi.Blog.API.Extensions;
 using Amaggi.Blog.Application.DTO;
 using Amaggi.Blog.Application.Interfaces;
@@ -8,6 +9,7 @@ using Amaggi.Blog.Data;
 using Amaggi.Blog.Data.Repositories;
 using Amaggi.Blog.Domain.Entities;
 using Amaggi.Blog.Domain.Interfaces;
+using Amaggi.Blog.Domain.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +27,6 @@ namespace Amaggi.Blog.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddDbContext<BlogContext>(options =>
             {
                 options.UseLazyLoadingProxies()
@@ -34,100 +35,22 @@ namespace Amaggi.Blog.API
 
             builder.Services.AddControllers();
 
-            builder.Services.AddScoped<IValidator<Usuario>, UsuarioValidator>();
-            builder.Services.AddScoped<IValidator<Post>, PostValidator>();
-            builder.Services.AddScoped<IValidator<CredencialDTO>, CredencialValidator>();
+            builder.Services.RegisterServices();
 
-            builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-            builder.Services.AddScoped<IUsuarioAppService, UsuarioAppService>();
+            // Configurar URLs em minúsculas
+            builder.Services.AddRouting(options =>
+            {
+                options.LowercaseUrls = true;
+                options.LowercaseQueryStrings = true;
+            });
 
-            builder.Services.AddScoped<IPostRepository, PostRepository>();
-            builder.Services.AddScoped<IPostAppService, PostAppService>();
-
-            builder.Services.AddScoped<ITokenAppService, TokenAppService>();
-
-            // AutoMapper configuration, make sure you have mapping profiles setup in your project
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            // Authentication and JWT configuration
-            var appSettingsSection = builder.Configuration.GetSection("jwt");
-            builder.Services.Configure<JWTSettings>(appSettingsSection);
-
-            var jwtSettings = appSettingsSection.Get<JWTSettings>();
-            var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
-
-            builder.Services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience
-                };
-            });
+            builder.Services.AddAuthenticationConfig(builder.Configuration);
 
             builder.Services.AddAuthorization();
 
-            // Swagger configuration
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Version = "v1",
-                    Title = "API de Autenticação com JWT",
-                    Description = "Uma API ASP.NET Core para autenticação de usuários usando JSON Web Token",
-                    TermsOfService = new Uri("https://example.com/terms"),
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Seu Nome",
-                        Email = "seuemail@example.com",
-                        Url = new Uri("https://example.com")
-                    },
-                    License = new OpenApiLicense
-                    {
-                        Name = "MIT",
-                        Url = new Uri("https://opensource.org/licenses/MIT")
-                    }
-                });
-
-                // Adicionar suporte para JWT na UI do Swagger
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "Insira o token JWT desta maneira: Bearer {seu token}",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
-
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] {}
-                    }
-                });
-            });
-
+            builder.Services.AddSwaggerConfig();
 
             var app = builder.Build();
 

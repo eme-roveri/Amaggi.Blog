@@ -13,11 +13,6 @@
 
         public BlogContext(DbContextOptions<BlogContext> options) : base(options) { }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer("BlogConnString");
-        //}
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration<Usuario>(new UsuarioConfiguration());

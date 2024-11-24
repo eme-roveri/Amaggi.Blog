@@ -31,16 +31,18 @@ namespace Amaggi.Blog.Data.Repositories
             return await _dbSet.FirstOrDefaultAsync(p => p.Email == email);
         }
 
-        public async Task AddAsync(Usuario entity)
+        public async Task<int> AddAsync(Usuario usuario)
         {
-            await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(usuario);
 
             await _context.SaveChangesAsync();
+
+            return usuario.Id;
         }
 
-        public async Task UpdateAsync(Usuario entity)
+        public async Task UpdateAsync(Usuario usuario)
         {
-            _dbSet.Update(entity);
+            _dbSet.Update(usuario);
 
             await _context.SaveChangesAsync();
         }

@@ -24,9 +24,16 @@ namespace Amaggi.Blog.API.Controllers
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar(UsuarioDTO usuarioDTO)
         {
-            await _usuarioAppService.RegistrarAsync(usuarioDTO);
+            try
+            {
+                usuarioDTO.Id = await _usuarioAppService.RegistrarAsync(usuarioDTO);
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(CustomResponse.Error(exc.Message));
+            }
 
-            return Ok("Usuário registrado com sucesso");
+            return Ok(CustomResponse.Success("Usuário registrado com sucesso", usuarioDTO.Id));
         }
 
         [AllowAnonymous]
@@ -39,10 +46,10 @@ namespace Amaggi.Blog.API.Controllers
             {
                 var jwToken = _tokenAppService.GenerateJwtToken(usuario);
 
-                return Ok(jwToken);
+                return Ok(CustomResponse.Success("Login efetuado com sucesso e Token gerado", jwToken));
             }
 
-            return Unauthorized("As credenciais fornecidas não são válidas");
+            return Unauthorized(CustomResponse.Error("As credenciais fornecidas não são válidas"));
         }
     }
 }

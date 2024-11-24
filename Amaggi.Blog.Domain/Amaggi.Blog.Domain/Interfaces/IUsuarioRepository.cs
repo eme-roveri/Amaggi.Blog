@@ -9,7 +9,7 @@ namespace Amaggi.Blog.Domain.Interfaces
 {
     public interface IUsuarioRepository
     {
-        Task AddAsync(Usuario entity);
+        Task<int> AddAsync(Usuario entity);
         Task<Usuario> GetByIdAsync(int id);
         Task<Usuario> GetByEmail(string email);
         Task UpdateAsync(Usuario entity);

@@ -9,10 +9,10 @@ namespace Amaggi.Blog.Domain.Interfaces
 {
     public interface IPostRepository
     {
-        Task AddAsync(Post entity);
+        Task<Post> AddAsync(Post post);
         Task DeleteAsync(int id);
         Task<IEnumerable<Post>> GetAllAsync();
         Task<Post> GetByIdAsync(int id);
-        Task UpdateAsync(Post entity);
+        Task UpdateAsync(Post post);
     }
 }

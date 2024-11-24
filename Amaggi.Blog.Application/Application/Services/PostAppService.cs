@@ -15,11 +15,13 @@ namespace Amaggi.Blog.Application.Services
 {
     public class PostAppService : IPostAppService
     {
+        private readonly IPostService _postService;
         private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
 
-        public PostAppService(IPostRepository postRepository, IMapper mapper)
+        public PostAppService(IPostService postService, IPostRepository postRepository, IMapper mapper)
         {
+            _postService = postService;
             _postRepository = postRepository;
             _mapper = mapper;
         }
@@ -36,33 +38,35 @@ namespace Amaggi.Blog.Application.Services
             return _mapper.Map<PostDTO>(post);
         }
 
-        public async Task CreatePostAsync(PostDTO PostDTO)
+        public async Task<PostDTO> CreatePostAsync(PostDTO postDTO)
         {
-            var post = _mapper.Map<Post>(PostDTO);
-            await _postRepository.AddAsync(post);
+            var post = _mapper.Map<Post>(postDTO);
+            post = await _postRepository.AddAsync(post);
+
+            postDTO.Id = post.Id;
+
+            return postDTO;
         }
-        public async Task UpdatePostAsync(PostDTO PostDTO, int usuarioIdLogado)
+        public async Task UpdatePostAsync(PostDTO postDTO, int usuarioIdLogado)
         {
-            var post = await _postRepository.GetByIdAsync(PostDTO.Id);
-
-            if (post is null)
+            if (await _postService.PostPertenceOutroUsuario(postDTO.Id, usuarioIdLogado))
             {
-                throw new ApplicationException("Post não encontrado");
+                throw new ApplicationException("Você não tem permissão para editar este post.");
             }
 
-            if (post.UsuarioId != usuarioIdLogado)
-            {
-                throw new UnauthorizedAccessException("Você não tem permissão para editar este post.");
-            }
-
-            post = _mapper.Map<Post>(PostDTO);
+            var post = _mapper.Map<Post>(postDTO);
 
             await _postRepository.UpdateAsync(post);
         }
 
-        public async Task DeletePostAsync(int id)
+        public async Task DeletePostAsync(int postId, int usuarioIdLogado)
         {
-            await _postRepository.DeleteAsync(id);
+            if (await _postService.PostPertenceOutroUsuario(postId, usuarioIdLogado))
+            {
+                throw new ApplicationException("Você não tem permissão para excluir este post.");
+            }
+
+            await _postRepository.DeleteAsync(postId);
         }
     }
 }

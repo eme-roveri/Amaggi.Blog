@@ -21,27 +21,11 @@ namespace Amaggi.Blog.Application.Services
 
         public string GenerateJwtToken(UsuarioDTO usuario)
         {
-            //var tokenHandler = new JwtSecurityTokenHandler();
-            //var key = Encoding.ASCII.GetBytes(Secret);
-            ////var key = Encoding.ASCII.GetBytes(Settings.Secret);
-            //var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = new ClaimsIdentity(new Claim[]
-            //    {
-            //        new Claim(ClaimTypes.Name, usuario.Email),
-            //        new Claim(ClaimTypes.Name, usuario.Nome),
-            //    }),
-            //    Expires = DateTime.UtcNow.AddHours(1),
-            //    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            //};
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-            //return tokenHandler.WriteToken(token);
-
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.UniqueName, usuario.Nome),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.NameId, usuario.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Name, usuario.Nome),
+                new Claim(JwtRegisteredClaimNames.Email, usuario.Email)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
