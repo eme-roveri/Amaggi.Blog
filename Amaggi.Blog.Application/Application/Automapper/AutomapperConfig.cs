@@ -14,7 +14,11 @@ namespace Amaggi.Blog.Application.Automapper
         public AutomapperConfig()
         {
             CreateMap<Usuario, UsuarioDTO>().ReverseMap();
-            CreateMap<Post, PostDTO>().ReverseMap();
+
+            CreateMap<Post, PostDTO>()
+                .ForMember(dest => dest.NomePublicador, opt => opt.MapFrom(src => src.Usuario.Nome));
+
+            CreateMap<PostDTO, Post>();
         }
     }
 }

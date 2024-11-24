@@ -41,9 +41,22 @@ namespace Amaggi.Blog.Application.Services
             var post = _mapper.Map<Post>(PostDTO);
             await _postRepository.AddAsync(post);
         }
-        public async Task UpdatePostAsync(PostDTO PostDTO)
+        public async Task UpdatePostAsync(PostDTO PostDTO, int usuarioIdLogado)
         {
-            var post = _mapper.Map<Post>(PostDTO);
+            var post = await _postRepository.GetByIdAsync(PostDTO.Id);
+
+            if (post is null)
+            {
+                throw new ApplicationException("Post não encontrado");
+            }
+
+            if (post.UsuarioId != usuarioIdLogado)
+            {
+                throw new UnauthorizedAccessException("Você não tem permissão para editar este post.");
+            }
+
+            post = _mapper.Map<Post>(PostDTO);
+
             await _postRepository.UpdateAsync(post);
         }
 

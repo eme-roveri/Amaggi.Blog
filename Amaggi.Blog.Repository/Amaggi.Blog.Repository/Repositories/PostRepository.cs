@@ -22,7 +22,7 @@ namespace Amaggi.Blog.Data.Repositories
 
         public async Task<IEnumerable<Post>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.AsNoTracking().ToListAsync();
         }
 
         public async Task<Post> GetByIdAsync(int id)

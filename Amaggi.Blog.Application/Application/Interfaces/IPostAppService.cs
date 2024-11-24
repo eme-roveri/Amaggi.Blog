@@ -8,6 +8,6 @@ namespace Amaggi.Blog.Application.Interfaces
         Task DeletePostAsync(int id);
         Task<IEnumerable<PostDTO>> GetAllPostsAsync();
         Task<PostDTO> GetPostByIdAsync(int id);
-        Task UpdatePostAsync(PostDTO PostDTO);
+        Task UpdatePostAsync(PostDTO PostDTO, int usuarioIdLogado);
     }
 }

@@ -1,4 +1,5 @@
 
+using Amaggi.Blog.API.Extensions;
 using Amaggi.Blog.Application.DTO;
 using Amaggi.Blog.Application.Interfaces;
 using Amaggi.Blog.Application.Services;
@@ -49,6 +50,12 @@ namespace Amaggi.Blog.API
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // Authentication and JWT configuration
+            var appSettingsSection = builder.Configuration.GetSection("jwt");
+            builder.Services.Configure<JWTSettings>(appSettingsSection);
+
+            var jwtSettings = appSettingsSection.Get<JWTSettings>();
+            var key = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+
             builder.Services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,14 +67,17 @@ namespace Amaggi.Blog.API
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"]
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience
                 };
             });
+
+            builder.Services.AddAuthorization();
 
             // Swagger configuration
             builder.Services.AddEndpointsApiExplorer();

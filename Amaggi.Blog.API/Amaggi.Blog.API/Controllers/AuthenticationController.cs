@@ -29,6 +29,7 @@ namespace Amaggi.Blog.API.Controllers
             return Ok("Usuário registrado com sucesso");
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login(CredencialDTO credencial)
         {

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Amaggi.Blog.Application.DTO
@@ -12,8 +13,13 @@ namespace Amaggi.Blog.Application.DTO
         public int Id { get; set; }
         public string Titulo { get; set; }
         public string Conteudo { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DateTime DataPostagem { get; set; }
-        public Guid UsuarioId { get; set; }
-        public UsuarioDTO Usuario { get; set; }
+
+        public int UsuarioId { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string NomePublicador{ get; set; }
     }
 }
