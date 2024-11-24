@@ -9,36 +9,38 @@ using System.Threading.Tasks;
 
 namespace Amaggi.Blog.Data.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class PostRepository : IPostRepository
     {
         private readonly BlogContext _context;
-        private readonly DbSet<T> _dbSet;
+        private readonly DbSet<Post> _dbSet;
 
-        public Repository(BlogContext context)
+        public PostRepository(BlogContext context)
         {
             _context = context;
-            _dbSet = _context.Set<T>();
+            _dbSet = _context.Set<Post>();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<Post>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<Post> GetByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task AddAsync(T entity)
+        public async Task AddAsync(Post entity)
         {
             await _dbSet.AddAsync(entity);
+
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(T entity)
+        public async Task UpdateAsync(Post entity)
         {
             _dbSet.Update(entity);
+
             await _context.SaveChangesAsync();
         }
 
@@ -46,6 +48,7 @@ namespace Amaggi.Blog.Data.Repositories
         {
             var entity = await _dbSet.FindAsync(id);
             _dbSet.Remove(entity);
+
             await _context.SaveChangesAsync();
         }
     }

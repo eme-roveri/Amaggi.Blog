@@ -13,6 +13,6 @@ namespace Amaggi.Blog.Domain.Entities
         public string Conteudo { get; set; }
         public DateTime DataPostagem { get; set; } = DateTime.UtcNow;
         public int UsuarioId { get; set; }
-        public Usuario Usuario { get; set; }
+        public virtual Usuario Usuario { get; set; }
     }
 }

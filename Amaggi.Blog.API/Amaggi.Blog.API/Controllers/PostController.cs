@@ -10,9 +10,9 @@ namespace Amaggi.Blog.API.Controllers
     [Route("api/[controller]")]
     public class PostController : ControllerBase
     {
-        private readonly PostService _postService;
+        private readonly PostAppService _postService;
 
-        public PostController(PostService postService)
+        public PostController(PostAppService postService)
         {
             _postService = postService;
         }
@@ -21,6 +21,7 @@ namespace Amaggi.Blog.API.Controllers
         public async Task<IActionResult> GetAllPosts()
         {
             var postsDTO = await _postService.GetAllPostsAsync();
+
             return Ok(postsDTO);
         }
 
@@ -32,6 +33,7 @@ namespace Amaggi.Blog.API.Controllers
             {
                 return NotFound();
             }
+
             return Ok(postDTO);
         }
 
@@ -39,7 +41,8 @@ namespace Amaggi.Blog.API.Controllers
         public async Task<IActionResult> CreatePost(PostDTO PostDTO)
         {
             await _postService.CreatePostAsync(PostDTO);
-            return CreatedAtAction(nameof(GetPostById), new { id = PostDTO.Id }, PostDTO);
+
+            return Ok("Post criado com sucesso.");
         }
 
         [HttpPut("{id}")]
@@ -47,18 +50,20 @@ namespace Amaggi.Blog.API.Controllers
         {
             if (id != postDTO.Id)
             {
-                return BadRequest();
+                return BadRequest("O ID fornecido não corresponde ao ID do Post.");
             }
             await _postService.UpdatePostAsync(postDTO);
-            return NoContent();
+
+
+            return Ok(new { message = "Post atualizado com sucesso." });
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
             await _postService.DeletePostAsync(id);
-            return NoContent();
-        }
 
+            return Ok(new { message = "Post excluido com sucesso." });
+        }
     }
 }

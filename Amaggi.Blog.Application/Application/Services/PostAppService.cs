@@ -1,4 +1,5 @@
 ﻿using Amaggi.Blog.Application.DTO;
+using Amaggi.Blog.Application.Interfaces;
 using Amaggi.Blog.Application.Validation;
 using Amaggi.Blog.Domain.Entities;
 using Amaggi.Blog.Domain.Interfaces;
@@ -12,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace Amaggi.Blog.Application.Services
 {
-    public class PostService
+    public class PostAppService : IPostAppService
     {
-        private readonly IRepository<Post> _postRepository;
+        private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
 
-        public PostService(IRepository<Post> postRepository, IMapper mapper)
+        public PostAppService(IPostRepository postRepository, IMapper mapper)
         {
             _postRepository = postRepository;
             _mapper = mapper;
@@ -40,7 +41,6 @@ namespace Amaggi.Blog.Application.Services
             var post = _mapper.Map<Post>(PostDTO);
             await _postRepository.AddAsync(post);
         }
-
         public async Task UpdatePostAsync(PostDTO PostDTO)
         {
             var post = _mapper.Map<Post>(PostDTO);

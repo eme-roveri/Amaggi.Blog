@@ -27,6 +27,13 @@ namespace Amaggi.Blog.Application.Validation
             RuleFor(u => u.Senha)
                 .NotEmpty()
                 .WithMessage("Informe a senha do usuário.");
+
+            //RuleFor(x => x.ConfirmacaoSenha)
+            //    .NotEmpty().WithMessage("Confirme a senha informada");
+
+            //RuleFor(x => x)
+            //    .Must(x => x.Senha == x.ConfirmacaoSenha)
+            //    .WithMessage("As senhas informadas não são iguais");
         }
     }
 }

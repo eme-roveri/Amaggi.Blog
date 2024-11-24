@@ -28,11 +28,8 @@ namespace Amaggi.Blog.Data.Configurations
                 .HasColumnType("varchar(MAX)")
                 .IsRequired();
 
-            builder.Property(p => p.UsuarioId)
-                .IsRequired();
-
             builder.HasOne(p => p.Usuario)
-                .WithMany()
+                .WithMany(p => p.Posts)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

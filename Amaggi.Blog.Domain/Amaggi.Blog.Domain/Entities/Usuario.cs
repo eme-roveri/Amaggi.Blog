@@ -16,6 +16,6 @@ namespace Amaggi.Blog.Domain.Entities
 
         public string Senha { get; set; }
 
-        public List<Post> Posts { get; set; } = new();
+        public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
     }
 }

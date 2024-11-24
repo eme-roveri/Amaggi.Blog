@@ -1,5 +1,7 @@
 ﻿using Amaggi.Blog.Application.DTO;
+using Amaggi.Blog.Application.Interfaces;
 using Amaggi.Blog.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,32 +11,37 @@ namespace Amaggi.Blog.API.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UsuarioService _usuarioService;
+        private readonly IUsuarioAppService _usuarioAppService;
+        private readonly ITokenAppService _tokenAppService;
 
-        public AuthenticationController(UsuarioService UsuarioService)
+        public AuthenticationController(IUsuarioAppService usuarioAppService, ITokenAppService tokenService)
         {
-            _usuarioService = UsuarioService;
+            _usuarioAppService = usuarioAppService;
+            _tokenAppService = tokenService;
         }
 
+        [AllowAnonymous]
         [HttpPost("registrar")]
         public async Task<IActionResult> Registrar(UsuarioDTO usuarioDTO)
         {
-            await _usuarioService.RegisterUserAsync(usuarioDTO);
+            await _usuarioAppService.RegistrarAsync(usuarioDTO);
 
             return Ok("Usuário registrado com sucesso");
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(string nome, string senha)
+        public async Task<IActionResult> Login(CredencialDTO credencial)
         {
-            var usuarioDTO = await _usuarioService.LoginAsync(nome, senha);
+            var usuario = await _usuarioAppService.LoginAsync(credencial);
 
-            if (usuarioDTO == null)
+            if (usuario.Id != 0)
             {
-                return Unauthorized("As credenciais fornecidas não são válidas");
+                var jwToken = _tokenAppService.GenerateJwtToken(usuario);
+
+                return Ok(jwToken);
             }
 
-            return Ok(usuarioDTO);
+            return Unauthorized("As credenciais fornecidas não são válidas");
         }
     }
 }
